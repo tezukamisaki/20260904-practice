@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TODO App</title>
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .completed {
+      text-decoration: line-through;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container py-5" style="max-width: 600px;">
+    <h1 class="mb-4 text-center">TODO アプリ</h1>
+    <!-- 新規作成フォーム -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <form id="todo-form" class="row g-2">
+          <div class="col-9">
+            <input type="text" 
+                   id="todo-title" 
+                   class="form-control" 
+                   placeholder="新しいTODOを入力..." 
+                   required>
+          </div>
+          <div class="col-3">
+            <button type="submit" class="btn btn-primary w-100">追加</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- TODO一覧 -->
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <ul id="todo-list" class="list-group list-group-flush">
+          <% if (todos && todos.length> 0) { %>
+            <% todos.forEach(todo=> { %>
+              <li class="list-group-item d-flex justify-content-between align-items-center py-3"
+                data-id="<%= todo.id %>">
+                <div class="form-check">
+                  <input 
+                    class="form-check-input todo-checkbox" 
+                    type="checkbox" 
+                    <%=todo.completed ? 'checked' : '' %>
+                    id="todo-<%= todo.id %>" >
+                    <label 
+                    class="form-check-label 
+                    <%= todo.completed ? 'completed' : '' %>" 
+                    for="todo-<%= todo.id %>">
+                      <%= todo.title %>
+                    </label>
+                </div>
+                <button class="btn btn-sm btn-outline-danger delete-btn">削除</button>
+              </li>
+              <% }) %>
+                <% } else { %>
+                  <li 
+                    class="list-group-item text-center text-muted py-3" id="no-todos">
+                    TODOはまだありません
+                    </li>
+                  <% } %>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- フロントエンドのJavaScript処理 -->
+   
+  <script>
+       // 新規作成
+    document.getElementById('todo-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const titleInput = document.getElementById('todo-title');
+      const title = titleInput.value.trim();
+      if (!title) return;
+
+
+      try {
+        const response = await fetch('/todos/api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title })
+        });
+        if (response.ok) {
+          window.location.reload(); // リロードして一覧を更新
+        } else {
+          const err = await response.json();
+          alert(err.message || '作成に失敗しました');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('通信エラーが発生しました');
+      }
+    });
+
+    // 完了状態の切り替え
+    document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', async (e) => {
+        const li = e.target.closest('li');
+        const id = li.dataset.id;
+        const completed = e.target.checked;
+
+
+        try {
+          const response = await fetch(`/todos/api/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ completed })
+          });
+          if (response.ok) {
+            const label = li.querySelector('.form-check-label');
+            if (completed) {
+              label.classList.add('completed');
+            } else {
+              label.classList.remove('completed');
+            }
+          } else {
+            alert('更新に失敗しました');
+            e.target.checked = !completed; // 失敗時はチェックを戻す
+          }
+        } catch (error) {
+          console.error(error);
+          alert('通信エラーが発生しました');
+          e.target.checked = !completed;
+        }
+      });
+    });
+ // 削除
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const li = e.target.closest('li');
+        const id = li.dataset.id;
+
+
+        if (!confirm('このTODOを削除しますか？')) return;
+
+
+        try {
+          const response = await fetch(`/todos/api/${id}`, {
+            method: 'DELETE'
+          });
+          if (response.ok) {
+            li.remove();
+          } else {
+            alert('削除に失敗しました');
+          }
+        } catch (error) {
+          console.error(error);
+          alert('通信エラーが発生しました');
+        }
+      });
+    });
+
+  </script>
+</body>
+</html>
