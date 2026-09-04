@@ -128,6 +128,32 @@
       });
     });
 
+    // 削除
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const li = e.target.closest('li');
+        const id = li.dataset.id;
+
+
+        if (!confirm('このTODOを削除しますか？')) return;
+
+
+        try {
+          const response = await fetch(`/todos/api/${id}`, {
+            method: 'DELETE'
+          });
+          if (response.ok) {
+            li.remove();
+          } else {
+            alert('削除に失敗しました');
+          }
+        } catch (error) {
+          console.error(error);
+          alert('通信エラーが発生しました');
+        }
+      });
+    });
+
   </script>
 </body>
 </html>

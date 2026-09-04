@@ -8,10 +8,13 @@ const port: number = 3000;
 
 
 // 設定
+// 設定
+app.use(express.json()); // JSON形式のリクエストを受け取る
 app.use(express.urlencoded({ extended: true })); // POST通信設定
 app.use(express.static(path.join(__dirname, 'public'))); // 静的ファイルの指定
 app.set('view engine', 'ejs'); // テンプレートエンジンにEJSを設定
 app.set('views', path.join(__dirname, 'views')); // ビューのディレクトリを設定
+
 
 
 app.get('/', (req: Request, res: Response): void => {
