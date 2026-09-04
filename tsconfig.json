@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    /* ベース設定 */
+    "target": "ES2022",                  /* 出力する JavaScript のバージョン */
+    "module": "NodeNext",                /* モジュールシステム (Node.js の最新仕様に対応) */
+    "moduleResolution": "NodeNext",      /* モジュール解決方法 */
+
+    /* 出力設定 */
+    "outDir": "./dist",                  /* コンパイル後の JS ファイルの出力先 */
+    "rootDir": "./src",                  /* ソースコード (.ts) の配置先 */
+
+    /* 厳格な型チェック (品質と安全性を高める) */
+    "strict": true,                      /* すべての厳格な型チェックオプションを有効化 */
+    "noImplicitAny": true,               /* 暗黙の any 型を許容しない */
+    "strictNullChecks": true,            /* null と undefined の扱いを厳格にする */
+
+    /* モジュール互換性 */
+    "esModuleInterop": true,             /* CommonJS モジュールを ES modules 形式で import 可能にする */
+    "allowSyntheticDefaultImports": true,/* デフォルトエクスポートがないモジュールからのimportを許可 */
+    "skipLibCheck": true,                /* 定義ファイルの型チェックをスキップしてコンパイルを高速化 */
+    "forceConsistentCasingInFileNames": true /* ファイル名の大小文字を区別する */
+  },
+  /* コンパイル対象の指定 */
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
